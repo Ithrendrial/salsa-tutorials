@@ -239,6 +239,20 @@ $("editBtn").onclick = () => {
 };
 $("editCancel").onclick = () => $("detail").classList.remove("editing");
 
+$("deleteBtn").onclick = async () => {
+  if (!confirm(`Delete "${current.name}"? This can't be undone — the YouTube video itself stays on your channel.`)) return;
+  const idx = moves.findIndex((m) => m.id === current.id);
+  const [removed] = moves.splice(idx, 1);
+  try {
+    await commitMoves("Delete move: " + removed.name);
+    location.hash = "#/";
+    toast("Deleted");
+  } catch (err) {
+    moves.splice(idx, 0, removed);
+    toast(err.message);
+  }
+};
+
 $("edit-form").onsubmit = async (e) => {
   e.preventDefault();
   const name = $("e-name").value.trim();
