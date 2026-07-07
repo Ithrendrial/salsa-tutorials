@@ -36,7 +36,7 @@ Your app is now at `https://ithrendrial.github.io/salsa-tutorials/`
 2. **APIs & Services → Library** → enable **YouTube Data API v3**
 3. **APIs & Services → OAuth consent screen** → External → fill the basics,
    then under **Audience / Test users** add your own Google account
-   (leave the app in *Testing* — it's just for you)
+   (leave the app in *Testing* — no verification needed for personal use)
 4. **APIs & Services → Credentials → Create credentials → OAuth client ID**
    → type *Web application* → add **Authorized JavaScript origins**:
    - `https://ithrendrial.github.io`
@@ -73,3 +73,10 @@ then open http://localhost:8000
   browser and re-saved automatically on your next visit — nothing is lost.
 - **Editing YouTube itself:** edits here update the vault, not the video's
   title/description on YouTube. The vault is the source of truth.
+- **Whose YouTube account gets the video:** the client ID in `config.js`
+  isn't tied to one channel — whoever signs in at the upload popup is
+  where the video lands. To hand this off to someone else, add their
+  Google account under **OAuth consent screen → Audience → Test users**
+  (Google Cloud console) — until they're on that list, an unverified
+  Testing app will block their sign-in. Once added, they just open the
+  app and sign in with their own account; no code or config changes.
