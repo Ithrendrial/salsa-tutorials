@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FCFAF7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171210" media="(prefers-color-scheme: dark)">
+<title>Salsa Vault</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💃</text></svg>">
+<link rel="stylesheet" href="styles.css">
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="config.js"></script>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-inner">
+    <a href="#/" class="display wordmark"><span class="tilde">~</span> Salsa Vault</a>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+        <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5" opacity=".5"/>
+        <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" opacity=".5" stroke-linecap="round"/>
+      </svg>
+      <input type="search" id="q" placeholder="Search moves…" aria-label="Search moves">
+    </div>
+    <div class="bar-spacer"></div>
+    <a href="#/new" class="btn-primary">+ New move</a>
+  </div>
+</header>
+
+<!-- ============ LIBRARY ============ -->
+<main class="page view" id="view-library">
+  <div class="chip-rail" id="chips">
+    <span class="rail-label">Filter</span>
+    <button class="sort" id="sortBtn" title="Toggle sort">Newest ↓</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- ============ NEW MOVE ============ -->
+<main class="page narrow view" id="view-new">
+  <h1 class="display screen-title">New Move</h1>
+  <p class="screen-sub">The video uploads to your YouTube account as unlisted. You can edit everything later.</p>
+
+  <form id="new-form" novalidate>
+    <div class="field">
+      <label for="f-name">Move name <span class="req">*</span></label>
+      <input type="text" id="f-name" required placeholder="e.g. Cross Body Lead with Inside Turn">
+    </div>
+
+    <div class="field">
+      <label for="f-file">Video file <span class="req">*</span></label>
+      <label class="drop" id="drop" for="f-file">
+        <input type="file" id="f-file" accept="video/*" required>
+        <span id="drop-idle">
+          <strong>Tap to choose a video</strong> or drop one here<br>
+          <span class="drop-hint">Uploads to YouTube as unlisted</span>
+        </span>
+        <span id="drop-done" hidden>
+          🎬 <span class="filename" id="drop-filename"></span><br>
+          <span class="drop-hint">Tap to choose a different file</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label for="f-tags">Tags <span class="hint">— press Enter or comma to add</span></label>
+      <div class="tag-input" id="tagbox">
+        <input type="text" id="f-tags" placeholder="partnerwork, spins, beginner…" enterkeyhint="enter" autocapitalize="none">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="f-notes">Notes <span class="hint">— counts, timing, common mistakes</span></label>
+      <textarea id="f-notes" placeholder="Lead steps back on 1, opens on 3…"></textarea>
+    </div>
+
+    <div class="form-actions" id="newActions">
+      <button type="submit" class="btn-primary">Upload &amp; save</button>
+      <a href="#/" class="btn-quiet">Cancel</a>
+    </div>
+  </form>
+
+  <div class="progress-wrap" id="prog">
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    <div class="progress-label">
+      <span id="progText">Uploading to YouTube…</span>
+      <span id="progPct">0%</span>
+    </div>
+  </div>
+</main>
+
+<!-- ============ DETAIL ============ -->
+<main class="page narrow view" id="view-detail">
+  <a class="back" href="#/">← All moves</a>
+  <div class="detail" id="detail">
+    <div class="player" id="d-player"></div>
+
+    <div class="read-mode">
+      <div class="detail-head">
+        <h1 class="display" id="d-name"></h1>
+        <button class="btn-quiet" id="editBtn">Edit</button>
+      </div>
+      <div class="detail-tags" id="d-tags"></div>
+      <div class="detail-meta" id="d-meta"></div>
+      <div class="notes-block">
+        <h2>Notes</h2>
+        <div id="d-notes"></div>
+      </div>
+    </div>
+
+    <form class="edit-form" id="edit-form">
+      <div class="field">
+        <label for="e-name">Move name <span class="req">*</span></label>
+        <input type="text" id="e-name" required>
+      </div>
+      <div class="field">
+        <label for="e-tags">Tags <span class="hint">— comma separated</span></label>
+        <input type="text" id="e-tags" autocapitalize="none">
+      </div>
+      <div class="field">
+        <label for="e-notes">Notes</label>
+        <textarea id="e-notes"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Save changes</button>
+        <button type="button" class="btn-quiet" id="editCancel">Cancel</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<dialog id="token-dialog">
+  <form id="token-form">
+    <h2 class="display">Connect GitHub</h2>
+    <p>To save your vault, paste a fine-grained personal access token with <strong>Contents: read &amp; write</strong> on this repo. It's stored only in this browser. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create one here</a> — see the README for the two-minute walkthrough.</p>
+    <input type="password" id="token-input" placeholder="github_pat_…" autocomplete="off">
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Save token</button>
+      <button type="button" class="btn-quiet" id="token-cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
