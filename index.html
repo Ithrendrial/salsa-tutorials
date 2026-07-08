@@ -125,7 +125,11 @@
       <div class="form-actions">
         <button type="submit" class="btn-primary">Save changes</button>
         <button type="button" class="btn-quiet" id="editCancel">Cancel</button>
-        <button type="button" class="btn-quiet" id="deleteBtn" style="margin-left:auto;color:var(--accent)">Delete move</button>
+        <button type="button" class="btn-quiet" id="deleteBtn" aria-label="Delete move" title="Delete move" style="margin-left:auto;color:var(--accent)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+            <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/>
+          </svg>
+        </button>
       </div>
     </form>
   </div>

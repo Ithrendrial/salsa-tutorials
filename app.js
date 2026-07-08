@@ -240,7 +240,7 @@ $("editBtn").onclick = () => {
 $("editCancel").onclick = () => $("detail").classList.remove("editing");
 
 $("deleteBtn").onclick = async () => {
-  if (!confirm(`Delete "${current.name}"? This can't be undone — the YouTube video itself stays on your channel.`)) return;
+  if (!confirm("Are you sure you want to delete this move?")) return;
   const idx = moves.findIndex((m) => m.id === current.id);
   const [removed] = moves.splice(idx, 1);
   try {
