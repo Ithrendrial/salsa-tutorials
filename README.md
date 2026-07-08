@@ -1,4 +1,4 @@
-# 💃 Salsa Vault
+# 💃 Salsa Roja
 
 A personal vault for salsa tutorials. Fully static — no backend, no database:
 

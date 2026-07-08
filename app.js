@@ -1,4 +1,4 @@
-/* Salsa Vault — vanilla JS, no build step.
+/* Salsa Roja — vanilla JS, no build step.
    Data lives in moves.json in this repo, committed via the GitHub API.
    Videos upload straight to YouTube (unlisted) from the browser. */
 
