@@ -173,12 +173,12 @@ function renderChips() {
   updateChipMore();
 }
 
-// Mobile only: clamp the tag list to 2 rows with a See more/less toggle.
+// Clamp the tag list to 2 rows with a See more/less toggle when it overflows.
 function updateChipMore() {
   const strip = $("chipStrip"), more = $("chipMore");
   strip.classList.remove("collapsed");
   const chip = strip.querySelector(".chip");
-  if (!window.matchMedia("(max-width: 640px)").matches || !chip) { more.hidden = true; return; }
+  if (!chip) { more.hidden = true; return; }
   const twoRows = chip.offsetHeight * 2 + 8; // 8 = row gap
   strip.style.setProperty("--two-rows", twoRows + "px");
   if (strip.scrollHeight <= twoRows + 1) { more.hidden = true; return; }

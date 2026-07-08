@@ -108,11 +108,16 @@ input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
 
 /* ---------- Chips ---------- */
 .chip-rail {
-  display: flex; gap: 8px; align-items: center;
-  margin-bottom: 24px;
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 8px; row-gap: 10px; margin-bottom: 24px;
 }
-.chip-strip { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+.chip-strip {
+  order: 3; flex: 1 1 100%;
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.chip-strip.collapsed { max-height: var(--two-rows, 84px); overflow: hidden; }
 .chip-more {
+  order: 4; flex-basis: 100%;
   background: none; border: none; color: var(--accent);
   font-size: 13px; font-weight: 600; padding: 4px 2px; cursor: pointer;
   text-align: left;
@@ -128,11 +133,12 @@ input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
   color: var(--accent-ink); font-weight: 600;
 }
 .rail-label {
+  order: 1;
   font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
   color: var(--muted); margin-right: 4px;
 }
 .sort {
-  margin-left: auto; background: none; border: none;
+  order: 2; margin-left: auto; background: none; border: none;
   color: var(--muted); font-size: 13.5px; padding: 7px 8px; border-radius: 6px;
 }
 .sort:hover { color: var(--ink); }
@@ -321,11 +327,4 @@ dialog .form-actions { margin-top: 18px; }
   .detail-head h1 { font-size: 26px; }
   .player { border-radius: 10px; }
   .form-actions .btn-primary { flex: 1; }
-  /* Tag filters: show 2 rows collapsed, rest behind "See more" */
-  .chip-rail { flex-wrap: wrap; row-gap: 10px; }
-  .rail-label { order: 1; }
-  .sort { order: 2; margin-left: auto; }
-  .chip-strip { order: 3; flex: 1 1 100%; }
-  .chip-strip.collapsed { max-height: var(--two-rows, 84px); overflow: hidden; }
-  .chip-more { order: 4; flex-basis: 100%; }
 }
