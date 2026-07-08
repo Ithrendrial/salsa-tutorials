@@ -3,7 +3,7 @@
    Videos upload straight to YouTube (unlisted) from the browser. */
 
 let moves = [];
-let activeTag = null, query = "", sortNew = true, current = null, tagsExpanded = false;
+let activeTags = new Set(), query = "", sortNew = true, current = null, tagsExpanded = false;
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; };
@@ -160,16 +160,18 @@ const allTags = () => [...new Set(moves.flatMap((m) => m.tags))].sort();
 function renderChips() {
   const strip = $("chipStrip");
   strip.innerHTML = "";
-  if (activeTag && !allTags().includes(activeTag)) activeTag = null;
-  const mk = (label, val) => {
+  const tags = allTags();
+  for (const t of [...activeTags]) if (!tags.includes(t)) activeTags.delete(t);
+  const mk = (label, on, onclick) => {
     const b = document.createElement("button");
-    b.className = "chip" + (val === activeTag ? " on" : "");
+    b.className = "chip" + (on ? " on" : "");
     b.textContent = label;
-    b.onclick = () => { activeTag = val; renderChips(); renderGrid(); };
+    b.onclick = () => { onclick(); renderChips(); renderGrid(); };
     strip.appendChild(b);
   };
-  mk("All", null);
-  allTags().forEach((t) => mk(t, t));
+  mk("All", activeTags.size === 0, () => activeTags.clear());
+  tags.forEach((t) => mk(t, activeTags.has(t),
+    () => activeTags.has(t) ? activeTags.delete(t) : activeTags.add(t)));
   updateChipMore();
 }
 
@@ -191,7 +193,7 @@ function visibleMoves() {
   const q = query.toLowerCase();
   return moves
     .filter((m) =>
-      (!activeTag || m.tags.includes(activeTag)) &&
+      (activeTags.size === 0 || [...activeTags].every((t) => m.tags.includes(t))) && // move must have ALL selected tags
       (!q || m.name.toLowerCase().includes(q) ||
         m.tags.join(" ").toLowerCase().includes(q) ||
         (m.notes || "").toLowerCase().includes(q)))
