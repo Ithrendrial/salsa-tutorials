@@ -3,7 +3,7 @@
    Videos upload straight to YouTube (unlisted) from the browser. */
 
 let moves = [];
-let activeTag = null, query = "", sortNew = true, current = null;
+let activeTag = null, query = "", sortNew = true, current = null, tagsExpanded = false;
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; };
@@ -170,6 +170,21 @@ function renderChips() {
   };
   mk("All", null);
   allTags().forEach((t) => mk(t, t));
+  updateChipMore();
+}
+
+// Mobile only: clamp the tag list to 2 rows with a See more/less toggle.
+function updateChipMore() {
+  const strip = $("chipStrip"), more = $("chipMore");
+  strip.classList.remove("collapsed");
+  const chip = strip.querySelector(".chip");
+  if (!window.matchMedia("(max-width: 640px)").matches || !chip) { more.hidden = true; return; }
+  const twoRows = chip.offsetHeight * 2 + 8; // 8 = row gap
+  strip.style.setProperty("--two-rows", twoRows + "px");
+  if (strip.scrollHeight <= twoRows + 1) { more.hidden = true; return; }
+  more.hidden = false;
+  if (!tagsExpanded) strip.classList.add("collapsed");
+  more.textContent = tagsExpanded ? "See less" : "See more";
 }
 
 function visibleMoves() {
@@ -445,6 +460,9 @@ $("sortBtn").addEventListener("click", (e) => {
   e.target.textContent = sortNew ? "Newest ↓" : "A–Z ↓";
   renderGrid();
 });
+
+$("chipMore").addEventListener("click", () => { tagsExpanded = !tagsExpanded; updateChipMore(); });
+window.addEventListener("resize", updateChipMore);
 
 window.addEventListener("hashchange", route);
 loadMoves().then(route);

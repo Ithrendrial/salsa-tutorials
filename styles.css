@@ -112,6 +112,11 @@ input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
   margin-bottom: 24px;
 }
 .chip-strip { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+.chip-more {
+  background: none; border: none; color: var(--accent);
+  font-size: 13px; font-weight: 600; padding: 4px 2px; cursor: pointer;
+  text-align: left;
+}
 .chip {
   border: 1px solid var(--line); background: var(--surface);
   border-radius: 999px; padding: 7px 14px; font-size: 13.5px;
@@ -316,12 +321,11 @@ dialog .form-actions { margin-top: 18px; }
   .detail-head h1 { font-size: 26px; }
   .player { border-radius: 10px; }
   .form-actions .btn-primary { flex: 1; }
-  /* Tag filters: one swipeable row instead of many wrapped rows */
-  .chip-strip {
-    flex-wrap: nowrap; overflow-x: auto; min-width: 0;
-    -webkit-overflow-scrolling: touch; scrollbar-width: none;
-    padding-bottom: 2px;
-  }
-  .chip-strip::-webkit-scrollbar { display: none; }
-  .chip-strip .chip { flex: 0 0 auto; }
+  /* Tag filters: show 2 rows collapsed, rest behind "See more" */
+  .chip-rail { flex-wrap: wrap; row-gap: 10px; }
+  .rail-label { order: 1; }
+  .sort { order: 2; margin-left: auto; }
+  .chip-strip { order: 3; flex: 1 1 100%; }
+  .chip-strip.collapsed { max-height: var(--two-rows, 84px); overflow: hidden; }
+  .chip-more { order: 4; flex-basis: 100%; }
 }
