@@ -158,15 +158,15 @@ function route() {
 const allTags = () => [...new Set(moves.flatMap((m) => m.tags))].sort();
 
 function renderChips() {
-  const rail = $("chips");
-  rail.querySelectorAll(".chip").forEach((c) => c.remove());
+  const strip = $("chipStrip");
+  strip.innerHTML = "";
   if (activeTag && !allTags().includes(activeTag)) activeTag = null;
   const mk = (label, val) => {
     const b = document.createElement("button");
     b.className = "chip" + (val === activeTag ? " on" : "");
     b.textContent = label;
     b.onclick = () => { activeTag = val; renderChips(); renderGrid(); };
-    rail.insertBefore(b, $("sortBtn"));
+    strip.appendChild(b);
   };
   mk("All", null);
   allTags().forEach((t) => mk(t, t));
@@ -323,6 +323,27 @@ drop.addEventListener("drop", (e) => {
   }
 });
 
+// Pull the 11-char video ID out of any YouTube URL shape (or a bare ID)
+function extractYouTubeId(input) {
+  const s = String(input).trim();
+  const m = s.match(/(?:shorts\/|youtu\.be\/|watch\?v=|embed\/|\/v\/)([A-Za-z0-9_-]{11})/);
+  if (m) return m[1];
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  return null;
+}
+
+let videoMode = "upload"; // "upload" (new file) or "link" (existing video)
+document.querySelectorAll("#videoMode .seg-btn").forEach((b) => {
+  b.onclick = () => {
+    videoMode = b.dataset.mode;
+    document.querySelectorAll("#videoMode .seg-btn").forEach((x) => x.classList.toggle("on", x === b));
+    $("drop").hidden = videoMode !== "upload";
+    $("linkField").hidden = videoMode !== "link";
+    $("new-form").querySelector('button[type=submit]').textContent =
+      videoMode === "link" ? "Add move" : "Upload & save";
+  };
+});
+
 function setProgress(frac, label) {
   $("progFill").style.width = Math.round(frac * 100) + "%";
   $("progPct").textContent = Math.round(frac * 100) + "%";
@@ -332,9 +353,7 @@ function setProgress(frac, label) {
 $("new-form").onsubmit = async (e) => {
   e.preventDefault();
   const name = $("f-name").value.trim();
-  const file = $("f-file").files[0];
-  if (!name || !file) { toast("Move name and video file are required"); return; }
-  if (CONFIG.googleClientId.startsWith("YOUR_")) { toast("Fill in config.js first — see the README"); return; }
+  if (!name) { toast("Move name is required"); return; }
 
   const move = {
     id: null,
@@ -343,6 +362,29 @@ $("new-form").onsubmit = async (e) => {
     notes: $("f-notes").value.trim(),
     created: new Date().toISOString().slice(0, 10),
   };
+
+  // Link mode: no upload — just take the ID from the pasted URL and save.
+  if (videoMode === "link") {
+    const vid = extractYouTubeId($("f-url").value);
+    if (!vid) { toast("Paste a valid YouTube link"); return; }
+    if (moves.some((m) => m.id === vid)) { toast("That video is already in your vault"); return; }
+    move.id = vid;
+    moves.unshift(move);
+    try {
+      await commitMoves("Add move: " + name);
+      resetNewForm();
+      location.hash = "#/";
+      toast("Added " + name);
+    } catch (err) {
+      moves.splice(moves.indexOf(move), 1);
+      toast(err.message);
+    }
+    return;
+  }
+
+  const file = $("f-file").files[0];
+  if (!file) { toast("Choose a video file to upload"); return; }
+  if (CONFIG.googleClientId.startsWith("YOUR_")) { toast("Fill in config.js first — see the README"); return; }
 
   $("view-new").classList.add("uploading");
   $("prog").classList.add("active");
@@ -379,6 +421,7 @@ function resetNewForm() {
   $("drop-idle").hidden = false;
   $("drop-done").hidden = true;
   $("drop").classList.remove("armed");
+  document.querySelector('#videoMode .seg-btn[data-mode=upload]').click(); // back to upload mode
 }
 
 /* ---------- Shared ---------- */

@@ -32,6 +32,7 @@
 <main class="page view" id="view-library">
   <div class="chip-rail" id="chips">
     <span class="rail-label">Filter</span>
+    <div class="chip-strip" id="chipStrip"></div>
     <button class="sort" id="sortBtn" title="Toggle sort">Newest ↓</button>
   </div>
   <div class="grid" id="grid"></div>
@@ -49,9 +50,13 @@
     </div>
 
     <div class="field">
-      <label for="f-file">Video file <span class="req">*</span></label>
+      <label>Video <span class="req">*</span></label>
+      <div class="seg" id="videoMode">
+        <button type="button" class="seg-btn on" data-mode="upload">Upload new</button>
+        <button type="button" class="seg-btn" data-mode="link">Link existing</button>
+      </div>
       <label class="drop" id="drop" for="f-file">
-        <input type="file" id="f-file" accept="video/*" required>
+        <input type="file" id="f-file" accept="video/*">
         <span id="drop-idle">
           <strong>Tap to choose a video</strong> or drop one here<br>
           <span class="drop-hint">Uploads to YouTube as unlisted</span>
@@ -61,6 +66,10 @@
           <span class="drop-hint">Tap to choose a different file</span>
         </span>
       </label>
+      <div id="linkField" hidden>
+        <input type="text" id="f-url" placeholder="Paste a YouTube link (unlisted is fine)" autocapitalize="none">
+        <span class="hint" style="display:block;margin-top:7px">Links an existing video — nothing is uploaded.</span>
+      </div>
     </div>
 
     <div class="field">

@@ -35,6 +35,7 @@
 /* ================== end of theme block ===================== */
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; } /* beat component display rules like .drop{display:block} */
 body {
   margin: 0;
   background: var(--bg);
@@ -107,9 +108,10 @@ input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
 
 /* ---------- Chips ---------- */
 .chip-rail {
-  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  display: flex; gap: 8px; align-items: center;
   margin-bottom: 24px;
 }
+.chip-strip { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
 .chip {
   border: 1px solid var(--line); background: var(--surface);
   border-radius: 999px; padding: 7px 14px; font-size: 13.5px;
@@ -198,6 +200,16 @@ input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
   cursor: pointer; transition: border-color .15s;
 }
 .drop:hover, .drop.armed, .drop.dragover { border-color: var(--accent); }
+.seg {
+  display: inline-flex; gap: 4px; margin-bottom: 12px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: 3px;
+}
+.seg-btn {
+  background: none; border: none; border-radius: 6px;
+  padding: 7px 15px; font-size: 13.5px; color: var(--muted); font-weight: 500;
+}
+.seg-btn.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .drop strong { color: var(--ink); }
 .drop .filename { color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
 .drop .drop-hint { font-size: 13px; }
@@ -304,4 +316,12 @@ dialog .form-actions { margin-top: 18px; }
   .detail-head h1 { font-size: 26px; }
   .player { border-radius: 10px; }
   .form-actions .btn-primary { flex: 1; }
+  /* Tag filters: one swipeable row instead of many wrapped rows */
+  .chip-strip {
+    flex-wrap: nowrap; overflow-x: auto; min-width: 0;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .chip-strip::-webkit-scrollbar { display: none; }
+  .chip-strip .chip { flex: 0 0 auto; }
 }
