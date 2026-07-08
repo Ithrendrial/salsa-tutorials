@@ -162,6 +162,9 @@ function renderChips() {
   strip.innerHTML = "";
   const tags = allTags();
   for (const t of [...activeTags]) if (!tags.includes(t)) activeTags.delete(t);
+  // Selected tags float to the front so they stay visible even when collapsed.
+  const ordered = [...tags].sort((a, b) =>
+    (activeTags.has(b) - activeTags.has(a)) || a.localeCompare(b));
   const mk = (label, on, onclick) => {
     const b = document.createElement("button");
     b.className = "chip" + (on ? " on" : "");
@@ -170,7 +173,7 @@ function renderChips() {
     strip.appendChild(b);
   };
   mk("All", activeTags.size === 0, () => activeTags.clear());
-  tags.forEach((t) => mk(t, activeTags.has(t),
+  ordered.forEach((t) => mk(t, activeTags.has(t),
     () => activeTags.has(t) ? activeTags.delete(t) : activeTags.add(t)));
   updateChipMore();
 }
