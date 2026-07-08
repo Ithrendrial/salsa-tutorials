@@ -366,7 +366,9 @@
   {
     "id": "fiGSfcFwdGY",
     "name": "Level 2: June 3 2026",
-    "tags": [],
+    "tags": [
+      "level 2"
+    ],
     "notes": "",
     "created": "2026-06-13"
   },
