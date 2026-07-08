@@ -209,8 +209,8 @@ function renderGrid() {
   g.innerHTML = "";
   if (!list.length) {
     g.innerHTML = moves.length
-      ? '<div class="empty">No moves match — try clearing the filter.</div>'
-      : '<div class="empty">Your vault is empty.<br><a class="btn-primary" href="#/new">Add your first move</a></div>';
+      ? '<div class="empty">No results.</div>'
+      : '<div class="empty">No moves.<br><a class="btn-primary" href="#/new">Add your first move</a></div>';
     return;
   }
   for (const m of list) {
@@ -244,10 +244,10 @@ function openDetail(id) {
              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" title="${esc(current.name)}"></iframe>`;
   $("d-name").textContent = current.name;
   $("d-tags").innerHTML = current.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("");
-  $("d-meta").textContent = `Added ${current.created ? fmtDate(current.created) : "—"} · Unlisted on YouTube`;
+  $("d-meta").textContent = `Added ${current.created ? fmtDate(current.created) : "—"}`;
   $("d-notes").innerHTML = current.notes
     ? current.notes.split("\n").filter(Boolean).map((p) => `<p>${esc(p)}</p>`).join("")
-    : '<p class="hint">No notes yet — tap Edit to add some.</p>';
+    : '<p class="hint">No notes yet - edit to add.</p>';
   show("detail");
 }
 
