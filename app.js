@@ -148,9 +148,9 @@ function route() {
   } else if (h === "#/new") {
     show("new");
   } else {
+    show("library"); // must be visible before renderChips measures tag rows
     renderChips();
     renderGrid();
-    show("library");
   }
 }
 
