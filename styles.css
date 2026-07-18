@@ -48,7 +48,8 @@ body {
   font-family: "Montserrat", "Avenir Next", "Helvetica Neue", sans-serif;
   font-weight: 700;
 }
-.wordmark, .screen-title { text-transform: uppercase; letter-spacing: -0.02em; color: var(--accent); }
+.wordmark, .screen-title { text-transform: uppercase; letter-spacing: -0.02em; }
+.screen-title { color: var(--accent); }
 button { font: inherit; color: inherit; cursor: pointer; }
 input, textarea { font: inherit; color: inherit; }
 input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
@@ -71,7 +72,7 @@ input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
 .wordmark {
   font-size: 22px; line-height: 1; letter-spacing: .06em;
   display: flex; align-items: center; gap: 10px; white-space: nowrap;
-  text-decoration: none;
+  text-decoration: none; color: var(--ink);
 }
 .back-btn {
   background: none; border: none; padding: 8px; margin-left: -8px;
