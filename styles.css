@@ -353,7 +353,7 @@ dialog .form-actions { margin-top: 18px; }
 
 /* ---------- Floating new-move button (library only) ---------- */
 .fab {
-  position: fixed; right: 20px; bottom: calc(24px + env(safe-area-inset-bottom));
+  position: fixed; right: 28px; bottom: calc(34px + env(safe-area-inset-bottom));
   width: 58px; height: 58px; border-radius: 50%;
   background: var(--accent); color: var(--accent-ink);
   display: flex; align-items: center; justify-content: center;
