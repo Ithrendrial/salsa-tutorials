@@ -425,9 +425,17 @@ document.addEventListener("click", (e) => {
 });
 $("svEdit").onclick = () => { $("svMenu").hidden = true; openSessionForm(); };
 
+// The log/session page is always opened from the move detail, so return by
+// popping that entry — pushing a fresh #/move would leave the log page in
+// history and the back-arrow would land back on it.
+function backToMove() {
+  if (history.length > 1) history.back();
+  else location.hash = "#/move/" + encodeURIComponent(logMove.id);
+}
+
 $("s-cancel").onclick = () => {
   if (logSession) renderSessionRead(); // back to view mode
-  else location.hash = "#/move/" + encodeURIComponent(logMove.id);
+  else backToMove();
 };
 
 $("s-file").addEventListener("change", () => {
@@ -482,7 +490,7 @@ $("log-form").onsubmit = async (e) => {
         throw err;
       }
     }
-    location.hash = "#/move/" + encodeURIComponent(logMove.id);
+    backToMove();
   } catch (err) {
     toast(err.message);
   } finally {
@@ -499,7 +507,7 @@ $("svDelete").onclick = async () => {
   sessions.splice(idx, 1);
   try {
     await commitMoves("Delete practice: " + logMove.name);
-    location.hash = "#/move/" + encodeURIComponent(logMove.id);
+    backToMove();
     toast("Session deleted");
   } catch (err) {
     sessions.splice(idx, 0, logSession);
