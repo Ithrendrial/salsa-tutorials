@@ -18,7 +18,16 @@
       "level 3"
     ],
     "notes": "",
-    "created": "2026-07-16"
+    "created": "2026-07-16",
+    "sessions": [
+      {
+        "id": 1784364155854,
+        "date": "2026-07-18",
+        "rating": 0,
+        "notes": "",
+        "videoId": null
+      }
+    ]
   },
   {
     "id": "CLdvwYVb1RM",
