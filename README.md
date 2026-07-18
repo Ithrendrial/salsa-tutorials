@@ -1,6 +1,6 @@
 # 💃 Salsa Roja
 
-A personal vault for salsa tutorials. Fully static — no backend, no database:
+A personal app for salsa tutorials. Fully static — no backend, no database.
 
 - **Videos** upload from your browser straight to **your YouTube account as unlisted**
 - **Metadata** (name, tags, notes) lives in [`moves.json`](moves.json), committed back to this repo via the GitHub API
@@ -13,12 +13,6 @@ app.js       search, filters, YouTube upload, GitHub saves
 config.js    your Google client ID + repo details  ← fill this in
 moves.json   the "database"
 ```
-
-## Changing the look
-
-Open `styles.css`. The **theme block at the top** is the entire color
-scheme — light mode and dark mode side by side, each value commented.
-Change `--accent` and you've rebranded the app.
 
 ## One-time setup
 
@@ -52,31 +46,3 @@ browser's localStorage — once per device).
    [Fine-grained personal access tokens](https://github.com/settings/personal-access-tokens/new)
 2. Repository access: **only this repo** · Permissions: **Contents → Read and write**
 3. Paste it into the app when prompted
-
-## Running locally
-
-```sh
-python3 -m http.server 8000
-```
-
-then open http://localhost:8000
-
-## Good to know
-
-- **Upload quota:** YouTube's default API quota allows ~6 uploads/day
-  (each upload costs 1600 of the 10,000 daily units). Plenty for classes;
-  a quota increase can be requested from Google if ever needed.
-- **Unlisted, not private:** unlisted videos play in the embedded player
-  but don't appear in search or on your channel page. (Truly *private*
-  videos can't be embedded at all.)
-- **If a save fails** after a video uploaded, the move is kept in your
-  browser and re-saved automatically on your next visit — nothing is lost.
-- **Editing YouTube itself:** edits here update the vault, not the video's
-  title/description on YouTube. The vault is the source of truth.
-- **Whose YouTube account gets the video:** the client ID in `config.js`
-  isn't tied to one channel — whoever signs in at the upload popup is
-  where the video lands. To hand this off to someone else, add their
-  Google account under **OAuth consent screen → Audience → Test users**
-  (Google Cloud console) — until they're on that list, an unverified
-  Testing app will block their sign-in. Once added, they just open the
-  app and sign in with their own account; no code or config changes.
