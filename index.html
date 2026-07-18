@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
 <title>Salsa Roja</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💃</text></svg>">
-<link rel="stylesheet" href="styles.css?v=7">
+<link rel="stylesheet" href="styles.css?v=8">
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="config.js"></script>
 </head>
@@ -18,6 +18,9 @@
 
 <header class="bar">
   <div class="bar-inner">
+    <button type="button" class="back-btn" id="backBtn" aria-label="Back" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
     <a href="#/" class="display wordmark"><span class="tilde">~</span> Salsa Roja</a>
     <div class="search">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
@@ -27,7 +30,6 @@
       <input type="search" id="q" placeholder="Search moves…" aria-label="Search moves">
     </div>
     <div class="bar-spacer"></div>
-    <a href="#/new" class="btn-primary">+ New move</a>
   </div>
 </header>
 
@@ -40,6 +42,9 @@
     <button class="sort" id="sortBtn" title="Toggle sort">Newest ↓</button>
   </div>
   <div class="grid" id="grid"></div>
+  <a class="fab" href="#/new" aria-label="New move" title="New move">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  </a>
 </main>
 
 <!-- ============ NEW MOVE ============ -->
@@ -105,7 +110,6 @@
 
 <!-- ============ DETAIL ============ -->
 <main class="page narrow view" id="view-detail">
-  <a class="back" href="#/">← All moves</a>
   <div class="detail" id="detail">
     <div class="player" id="d-player"></div>
 
@@ -167,14 +171,31 @@
 
 <!-- ============ LOG / EDIT PRACTICE SESSION ============ -->
 <main class="page narrow view" id="view-log">
-  <a class="back" id="logBack" href="#/">← Back to move</a>
-  <h1 class="display screen-title" id="log-title">Log Practice</h1>
+  <div class="log-head">
+    <h1 class="display screen-title" id="log-title">Log Practice</h1>
+    <div class="menu-wrap" id="svMenuWrap" hidden>
+      <button type="button" class="btn-quiet menu-btn" id="svMenuBtn" aria-label="Session options" aria-haspopup="menu">⋯</button>
+      <div class="menu" id="svMenu" role="menu" hidden>
+        <button type="button" id="svEdit" role="menuitem">Edit session</button>
+        <button type="button" id="svDelete" role="menuitem" class="danger">Delete session</button>
+      </div>
+    </div>
+  </div>
 
   <div class="field">
     <label>Current move</label>
     <div class="move-chip">
       <span class="mc-thumb" id="log-move-thumb"></span>
       <span class="mc-name display" id="log-move-name"></span>
+    </div>
+  </div>
+
+  <div id="session-read" hidden>
+    <div class="sv-stars" id="sv-stars"></div>
+    <div class="player" id="sv-player" hidden></div>
+    <div class="notes-block">
+      <h2 class="display">Notes</h2>
+      <div id="sv-notes"></div>
     </div>
   </div>
 
@@ -218,12 +239,7 @@
 
     <div class="form-actions">
       <button type="submit" class="btn-primary" id="s-submit">Add Session</button>
-      <a class="btn-quiet" id="s-cancel" href="#/">Cancel</a>
-      <button type="button" class="btn-quiet" id="s-delete" hidden aria-label="Delete session" title="Delete session" style="margin-left:auto;color:var(--accent)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
-          <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/>
-        </svg>
-      </button>
+      <button type="button" class="btn-quiet" id="s-cancel">Cancel</button>
     </div>
   </form>
 
@@ -250,6 +266,6 @@
 
 <div class="toast" id="toast" role="status"></div>
 
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

@@ -145,8 +145,12 @@ async function uploadVideo(file, { name, notes, tags }, onProgress) {
 function show(view) {
   document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
   $("view-" + view).classList.add("active");
+  const sub = view !== "library"; // subpage: back arrow left, app name right
+  document.body.classList.toggle("subpage", sub);
+  $("backBtn").hidden = !sub;
   window.scrollTo(0, 0);
 }
+$("backBtn").onclick = () => history.length > 1 ? history.back() : (location.hash = "#/");
 
 function route() {
   const h = location.hash;
@@ -355,16 +359,41 @@ function openLog(moveId, sessionId) {
   logSession = sessionId ? (logMove.sessions || []).find((s) => String(s.id) === sessionId) : null;
   if (sessionId && !logSession) { location.hash = "#/move/" + encodeURIComponent(moveId); return; }
 
-  const back = "#/move/" + encodeURIComponent(moveId);
-  $("logBack").href = back;
-  $("s-cancel").href = back;
-  $("log-title").textContent = logSession ? "Edit Session" : "Log Practice";
-  $("s-submit").textContent = logSession ? "Save Changes" : "Add Session";
-  $("s-delete").hidden = !logSession;
-
   $("log-move-thumb").innerHTML =
     `<img src="https://i.ytimg.com/vi/${encodeURIComponent(logMove.id)}/mqdefault.jpg" alt="" onerror="this.remove()">`;
   $("log-move-name").textContent = logMove.name;
+
+  // Existing sessions open read-only; the ⋯ menu switches to edit
+  if (logSession) renderSessionRead(); else openSessionForm();
+  show("log");
+}
+
+const starsHtml = (r) =>
+  `<span class="fill">${"★".repeat(r)}</span><span class="rest">${"★".repeat(5 - r)}</span>`;
+
+function renderSessionRead() {
+  $("log-title").textContent = logSession.date ? fmtDate(logSession.date) : "Practice Session";
+  $("svMenuWrap").hidden = false;
+  $("svMenu").hidden = true;
+  $("sv-stars").innerHTML = logSession.rating
+    ? starsHtml(logSession.rating)
+    : '<span class="session-none">Not rated</span>';
+  const hasVid = !!logSession.videoId;
+  $("sv-player").hidden = !hasVid;
+  $("sv-player").innerHTML = hasVid
+    ? `<iframe src="https://www.youtube.com/embed/${encodeURIComponent(logSession.videoId)}?rel=0" allowfullscreen title="Practice video"></iframe>`
+    : "";
+  $("sv-notes").innerHTML = logSession.notes
+    ? logSession.notes.split("\n").filter(Boolean).map((p) => `<p>${esc(p)}</p>`).join("")
+    : '<p class="hint">No notes for this session.</p>';
+  $("session-read").hidden = false;
+  $("log-form").hidden = true;
+}
+
+function openSessionForm() {
+  $("log-title").textContent = logSession ? "Edit Session" : "Log Practice";
+  $("svMenuWrap").hidden = true;
+  $("s-submit").textContent = logSession ? "Save Changes" : "Add Session";
 
   $("s-date").value = logSession?.date || new Date().toISOString().slice(0, 10);
   $("s-notes").value = logSession?.notes || "";
@@ -383,8 +412,21 @@ function openLog(moveId, sessionId) {
     ? `<iframe src="https://www.youtube.com/embed/${encodeURIComponent(logSession.videoId)}?rel=0" allowfullscreen title="Practice video"></iframe>`
     : "";
   $("s-novideo").hidden = !(logSession && !hasVid);
-  show("log");
+
+  $("session-read").hidden = true;
+  $("log-form").hidden = false;
 }
+
+$("svMenuBtn").onclick = () => { $("svMenu").hidden = !$("svMenu").hidden; };
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".menu-wrap")) $("svMenu").hidden = true;
+});
+$("svEdit").onclick = () => { $("svMenu").hidden = true; openSessionForm(); };
+
+$("s-cancel").onclick = () => {
+  if (logSession) renderSessionRead(); // back to view mode
+  else location.hash = "#/move/" + encodeURIComponent(logMove.id);
+};
 
 $("s-file").addEventListener("change", () => {
   const f = $("s-file").files[0];
@@ -447,7 +489,8 @@ $("log-form").onsubmit = async (e) => {
   }
 };
 
-$("s-delete").onclick = async () => {
+$("svDelete").onclick = async () => {
+  $("svMenu").hidden = true;
   if (!confirm("Are you sure you want to delete this session?")) return;
   const sessions = logMove.sessions;
   const idx = sessions.indexOf(logSession);
