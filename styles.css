@@ -445,7 +445,7 @@ dialog .form-actions { margin-top: 18px; }
   /* Mobile: floating + button instead of a header button */
   .new-move-btn { display: none; }
   .bar-inner { flex-wrap: wrap; gap: 14px; padding: 16px 16px; }
-  .wordmark { flex: 1; }
+  .wordmark { flex: 1; justify-content: center; } /* centered on the library; subpage rule still wins to keep it right-aligned there */
   .search { order: 3; max-width: none; flex-basis: 100%; margin: 0; }
   .search input { padding-top: 11px; padding-bottom: 11px; }
   .page { padding: 20px 16px calc(60px + env(safe-area-inset-bottom)); }
