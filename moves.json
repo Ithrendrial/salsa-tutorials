@@ -7,7 +7,16 @@
       "level 4"
     ],
     "notes": "",
-    "created": "2026-07-16"
+    "created": "2026-07-16",
+    "sessions": [
+      {
+        "id": 1784362579269,
+        "date": "2026-07-18",
+        "rating": 3,
+        "notes": "",
+        "videoId": null
+      }
+    ]
   },
   {
     "id": "a0Xg_4X2T_s",
