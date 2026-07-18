@@ -75,7 +75,7 @@ input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
   text-decoration: none; color: var(--ink);
 }
 .back-btn {
-  background: none; border: none; padding: 8px; margin-left: -8px;
+  background: none; border: none; padding: 2px; padding-left:8px ; margin-left: -8px;
   color: var(--ink); display: flex; border-radius: 50%;
 }
 
