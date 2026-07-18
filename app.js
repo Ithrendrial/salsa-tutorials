@@ -3,7 +3,7 @@
    Videos upload straight to YouTube (unlisted) from the browser. */
 
 let moves = [];
-let activeTags = new Set(), query = "", sortNew = true, current = null, tagsExpanded = false;
+let activeTags = new Set(), query = "", sortNew = true, current = null, tagsExpanded = false, sessionsExpanded = false;
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; };
@@ -31,8 +31,14 @@ async function loadMoves() {
   // Recover moves whose video uploaded but whose metadata commit failed
   const pending = JSON.parse(localStorage.getItem("pending") || "[]");
   for (const p of pending) if (!moves.some((m) => m.id === p.id)) moves.unshift(p);
-  if (pending.length && ghToken()) {
-    commitMoves("Recover " + pending.length + " pending move(s)").catch(() => {});
+  // Same for practice sessions whose video uploaded but save failed
+  const ps = JSON.parse(localStorage.getItem("pendingSessions") || "[]");
+  for (const p of ps) {
+    const m = moves.find((m) => m.id === p.moveId);
+    if (m && !(m.sessions || []).some((s) => s.id === p.session.id)) (m.sessions ||= []).unshift(p.session);
+  }
+  if ((pending.length || ps.length) && ghToken()) {
+    commitMoves("Recover pending saves").catch(() => {});
   }
 }
 
@@ -77,6 +83,7 @@ async function commitMoves(message) {
     throw new Error("Saving to GitHub failed (" + r.status + ")");
   }
   localStorage.setItem("pending", "[]");
+  localStorage.setItem("pendingSessions", "[]");
 }
 
 /* ============================================================
@@ -145,6 +152,9 @@ function route() {
   const h = location.hash;
   if (h.startsWith("#/move/")) {
     openDetail(decodeURIComponent(h.slice(7)));
+  } else if (h.startsWith("#/log/")) {
+    const [mid, sid] = h.slice(6).split("/");
+    openLog(decodeURIComponent(mid), sid);
   } else if (h === "#/new") {
     show("new");
   } else {
@@ -248,8 +258,44 @@ function openDetail(id) {
   $("d-notes").innerHTML = current.notes
     ? current.notes.split("\n").filter(Boolean).map((p) => `<p>${esc(p)}</p>`).join("")
     : '<p class="hint">No notes yet - edit to add.</p>';
+  sessionsExpanded = false;
+  renderPractice();
   show("detail");
 }
+
+/* ---------- Practice sessions ---------- */
+const moveSessions = (m) => [...(m.sessions || [])].sort(
+  (a, b) => (b.date || "").localeCompare(a.date || "") || (b.id || 0) - (a.id || 0));
+
+function renderPractice() {
+  const sessions = moveSessions(current);
+  $("d-count").textContent = sessions.length + (sessions.length === 1 ? " time" : " times");
+  $("logBtn").href = "#/log/" + encodeURIComponent(current.id);
+  const list = $("sessionList");
+  list.innerHTML = "";
+  if (!sessions.length) {
+    list.innerHTML = '<div class="session-none">No sessions yet — log your first practice.</div>';
+  }
+  for (const s of (sessionsExpanded ? sessions : sessions.slice(0, 3))) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "session-item";
+    b.innerHTML = `
+      <span class="session-thumb">${s.videoId
+        ? `<img src="https://i.ytimg.com/vi/${encodeURIComponent(s.videoId)}/mqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">`
+        : "👟"}</span>
+      <span class="session-date">${s.date ? fmtDate(s.date) : "—"}</span>
+      ${s.rating
+        ? `<span class="stars-sm"><span class="fill">${"★".repeat(s.rating)}</span><span class="rest">${"★".repeat(5 - s.rating)}</span></span>`
+        : '<span class="session-none">Not rated</span>'}`;
+    b.onclick = () => { location.hash = "#/log/" + encodeURIComponent(current.id) + "/" + s.id; };
+    list.appendChild(b);
+  }
+  const va = $("viewAllBtn");
+  va.hidden = sessions.length <= 3;
+  va.textContent = sessionsExpanded ? "Show Less" : "View All";
+}
+$("viewAllBtn").onclick = () => { sessionsExpanded = !sessionsExpanded; renderPractice(); };
 
 $("editBtn").onclick = () => {
   $("e-name").value = current.name;
@@ -291,11 +337,136 @@ $("edit-form").onsubmit = async (e) => {
   }
 };
 
+/* ---------- Log / edit practice session ---------- */
+let logMove = null, logSession = null, sRating = 0;
+
+function setRating(n) {
+  sRating = n;
+  document.querySelectorAll("#s-stars button").forEach((b) =>
+    b.classList.toggle("on", +b.dataset.v <= n));
+}
+document.querySelectorAll("#s-stars button").forEach((b) => {
+  b.onclick = () => setRating(+b.dataset.v === sRating ? 0 : +b.dataset.v); // tap current star to clear
+});
+
+function openLog(moveId, sessionId) {
+  logMove = moves.find((m) => m.id === moveId);
+  if (!logMove) { location.hash = "#/"; return; }
+  logSession = sessionId ? (logMove.sessions || []).find((s) => String(s.id) === sessionId) : null;
+  if (sessionId && !logSession) { location.hash = "#/move/" + encodeURIComponent(moveId); return; }
+
+  const back = "#/move/" + encodeURIComponent(moveId);
+  $("logBack").href = back;
+  $("s-cancel").href = back;
+  $("log-title").textContent = logSession ? "Edit Session" : "Log Practice";
+  $("s-submit").textContent = logSession ? "Save Changes" : "Add Session";
+  $("s-delete").hidden = !logSession;
+
+  $("log-move-thumb").innerHTML =
+    `<img src="https://i.ytimg.com/vi/${encodeURIComponent(logMove.id)}/mqdefault.jpg" alt="" onerror="this.remove()">`;
+  $("log-move-name").textContent = logMove.name;
+
+  $("s-date").value = logSession?.date || new Date().toISOString().slice(0, 10);
+  $("s-notes").value = logSession?.notes || "";
+  setRating(logSession?.rating || 0);
+
+  // Video: new sessions can attach one; editing shows the existing video.
+  // ponytail: no replacing a session's video on edit - delete + re-log covers it
+  $("s-file").value = "";
+  $("s-drop-idle").hidden = false;
+  $("s-drop-done").hidden = true;
+  $("s-drop").classList.remove("armed");
+  const hasVid = !!logSession?.videoId;
+  $("s-drop").hidden = !!logSession;
+  $("s-player").hidden = !hasVid;
+  $("s-player").innerHTML = hasVid
+    ? `<iframe src="https://www.youtube.com/embed/${encodeURIComponent(logSession.videoId)}?rel=0" allowfullscreen title="Practice video"></iframe>`
+    : "";
+  $("s-novideo").hidden = !(logSession && !hasVid);
+  show("log");
+}
+
+$("s-file").addEventListener("change", () => {
+  const f = $("s-file").files[0];
+  if (!f) return;
+  $("s-drop-filename").textContent = f.name + " · " + (f.size / 1048576).toFixed(0) + " MB";
+  $("s-drop-idle").hidden = true;
+  $("s-drop-done").hidden = false;
+  $("s-drop").classList.add("armed");
+});
+
+function setSProgress(frac, label) {
+  $("s-progFill").style.width = Math.round(frac * 100) + "%";
+  $("s-progPct").textContent = Math.round(frac * 100) + "%";
+  if (label) $("s-progText").textContent = label;
+}
+
+$("log-form").onsubmit = async (e) => {
+  e.preventDefault();
+  const date = $("s-date").value;
+  if (!date) { toast("Practice date is required"); return; }
+  const notes = $("s-notes").value.trim();
+  const file = logSession ? null : $("s-file").files[0];
+
+  $("view-log").classList.add("uploading");
+  if (file) { $("s-prog").classList.add("active"); setSProgress(0, "Uploading to YouTube…"); }
+  try {
+    let videoId = logSession ? (logSession.videoId ?? null) : null;
+    if (file) {
+      videoId = await uploadVideo(file,
+        { name: logMove.name + " — practice " + date, notes, tags: logMove.tags },
+        setSProgress);
+      setSProgress(1, "Saving to your vault…");
+    }
+    const sessions = (logMove.sessions = logMove.sessions || []);
+    const prev = logSession ? { ...logSession } : null;
+    if (logSession) Object.assign(logSession, { date, rating: sRating, notes });
+    else sessions.unshift({ id: Date.now(), date, rating: sRating, notes, videoId });
+    try {
+      await commitMoves((logSession ? "Edit" : "Log") + " practice: " + logMove.name);
+      toast(logSession ? "Session updated" : "Session logged");
+    } catch (err) {
+      if (!logSession && videoId) {
+        // The video IS on YouTube - keep the session and retry the save next visit
+        const ps = JSON.parse(localStorage.getItem("pendingSessions") || "[]");
+        ps.push({ moveId: logMove.id, session: sessions[0] });
+        localStorage.setItem("pendingSessions", JSON.stringify(ps));
+        toast("Video uploaded, but saving failed — it will retry on your next visit");
+      } else {
+        if (logSession) Object.assign(logSession, prev);
+        else sessions.shift();
+        throw err;
+      }
+    }
+    location.hash = "#/move/" + encodeURIComponent(logMove.id);
+  } catch (err) {
+    toast(err.message);
+  } finally {
+    $("view-log").classList.remove("uploading");
+    $("s-prog").classList.remove("active");
+  }
+};
+
+$("s-delete").onclick = async () => {
+  if (!confirm("Are you sure you want to delete this session?")) return;
+  const sessions = logMove.sessions;
+  const idx = sessions.indexOf(logSession);
+  sessions.splice(idx, 1);
+  try {
+    await commitMoves("Delete practice: " + logMove.name);
+    location.hash = "#/move/" + encodeURIComponent(logMove.id);
+    toast("Session deleted");
+  } catch (err) {
+    sessions.splice(idx, 0, logSession);
+    toast(err.message);
+  }
+};
+
 /* ---------- New move ---------- */
 function readTagChips() {
   const typed = $("f-tags").value.trim().toLowerCase(); // include un-entered text too
   const chips = [...$("tagbox").querySelectorAll(".tag")].map((c) => c.dataset.value);
-  if (typed) chips.push(typed);
+  if (typed) chips.push(...typed.split(",").map((s) => s.trim()).filter(Boolean));
   return [...new Set(chips)];
 }
 

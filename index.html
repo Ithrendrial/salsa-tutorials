@@ -4,10 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FCFAF7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#171210" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#141314" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
 <title>Salsa Roja</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💃</text></svg>">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="config.js"></script>
 </head>
@@ -114,8 +117,25 @@
       <div class="detail-tags" id="d-tags"></div>
       <div class="detail-meta" id="d-meta"></div>
       <div class="notes-block">
-        <h2>Notes</h2>
+        <h2 class="display">Notes</h2>
         <div id="d-notes"></div>
+      </div>
+
+      <div class="practice-block">
+        <div class="stat-card">
+          <div class="stat-icon">👟</div>
+          <div class="stat-label">Practiced</div>
+          <div class="stat-count display" id="d-count">0 times</div>
+        </div>
+        <a class="btn-primary log-btn" id="logBtn" href="#/">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="12" r="8"/><path d="M7 12l2 2 4-4M19 5v6M16 8h6"/></svg>
+          Log Practice Session
+        </a>
+        <div class="sessions-head">
+          <h2 class="display">Recent Sessions</h2>
+          <button type="button" class="view-all display" id="viewAllBtn" hidden>View All</button>
+        </div>
+        <div class="session-list" id="sessionList"></div>
       </div>
     </div>
 
@@ -145,6 +165,77 @@
   </div>
 </main>
 
+<!-- ============ LOG / EDIT PRACTICE SESSION ============ -->
+<main class="page narrow view" id="view-log">
+  <a class="back" id="logBack" href="#/">← Back to move</a>
+  <h1 class="display screen-title" id="log-title">Log Practice</h1>
+
+  <div class="field">
+    <label>Current move</label>
+    <div class="move-chip">
+      <span class="mc-thumb" id="log-move-thumb"></span>
+      <span class="mc-name display" id="log-move-name"></span>
+    </div>
+  </div>
+
+  <form id="log-form" novalidate>
+    <div class="field">
+      <label for="s-date">Practice date <span class="req">*</span></label>
+      <input type="date" id="s-date" required>
+    </div>
+
+    <div class="field">
+      <label>Video <span class="hint">— optional</span></label>
+      <label class="drop" id="s-drop" for="s-file">
+        <input type="file" id="s-file" accept="video/*">
+        <span id="s-drop-idle">
+          <span class="drop-cam"><svg width="24" height="20" viewBox="0 0 24 20" fill="currentColor" aria-hidden="true"><rect x="0" y="2" width="16" height="16" rx="3"/><path d="M17 8l7-4v12l-7-4z"/></svg></span>
+          <strong>Select video</strong><br>
+          <span class="drop-hint">Track your visual improvements · uploads as unlisted</span>
+        </span>
+        <span id="s-drop-done" hidden>
+          🎬 <span class="filename" id="s-drop-filename"></span><br>
+          <span class="drop-hint">Tap to choose a different file</span>
+        </span>
+      </label>
+      <div class="player" id="s-player" hidden></div>
+      <div class="hint" id="s-novideo" hidden>No video attached to this session.</div>
+    </div>
+
+    <div class="field">
+      <label>How did it feel? <span class="hint">— optional</span></label>
+      <div class="rate-card">
+        <div class="stars" id="s-stars">
+          <button type="button" data-v="1" aria-label="1 star">★</button>
+          <button type="button" data-v="2" aria-label="2 stars">★</button>
+          <button type="button" data-v="3" aria-label="3 stars">★</button>
+          <button type="button" data-v="4" aria-label="4 stars">★</button>
+          <button type="button" data-v="5" aria-label="5 stars">★</button>
+        </div>
+        <textarea id="s-notes" placeholder="Add notes…"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" id="s-submit">Add Session</button>
+      <a class="btn-quiet" id="s-cancel" href="#/">Cancel</a>
+      <button type="button" class="btn-quiet" id="s-delete" hidden aria-label="Delete session" title="Delete session" style="margin-left:auto;color:var(--accent)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+          <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/>
+        </svg>
+      </button>
+    </div>
+  </form>
+
+  <div class="progress-wrap" id="s-prog">
+    <div class="progress-track"><div class="progress-fill" id="s-progFill"></div></div>
+    <div class="progress-label">
+      <span id="s-progText">Uploading to YouTube…</span>
+      <span id="s-progPct">0%</span>
+    </div>
+  </div>
+</main>
+
 <dialog id="token-dialog">
   <form id="token-form">
     <h2 class="display">Connect GitHub</h2>
@@ -159,6 +250,6 @@
 
 <div class="toast" id="toast" role="status"></div>
 
-<script src="app.js?v=6"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>
