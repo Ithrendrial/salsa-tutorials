@@ -462,6 +462,15 @@
       "practiced"
     ],
     "notes": "",
-    "created": "2026-06-22"
+    "created": "2026-06-22",
+    "sessions": [
+      {
+        "id": 1784344316082,
+        "date": "2026-07-07",
+        "rating": 0,
+        "notes": "",
+        "videoId": null
+      }
+    ]
   }
 ]
