@@ -384,7 +384,16 @@
     "name": "Sam level 3: June 2, 2026",
     "tags": [],
     "notes": "Setenta por atras (?)\nSombrero double \nSombrero amedo \nArondabas",
-    "created": "2026-06-03"
+    "created": "2026-06-03",
+    "sessions": [
+      {
+        "id": 1784619459166,
+        "date": "2026-07-21",
+        "rating": 4,
+        "notes": "mice other than amedo",
+        "videoId": null
+      }
+    ]
   },
   {
     "id": "OmjHiEqOR4I",
