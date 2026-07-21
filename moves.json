@@ -472,7 +472,16 @@
       "tomas"
     ],
     "notes": "",
-    "created": "2026-06-18"
+    "created": "2026-06-18",
+    "sessions": [
+      {
+        "id": 1784620205297,
+        "date": "2026-07-21",
+        "rating": 4,
+        "notes": "",
+        "videoId": null
+      }
+    ]
   },
   {
     "id": "txPFQ9xSnFY",
