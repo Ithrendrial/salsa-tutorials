@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
 <title>Salsa Roja</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💃</text></svg>">
-<link rel="stylesheet" href="styles.css?v=14">
+<link rel="stylesheet" href="styles.css?v=15">
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="config.js"></script>
 </head>
@@ -42,9 +42,23 @@
     <button class="sort" id="sortBtn" title="Toggle sort">Newest ↓</button>
   </div>
   <div class="grid" id="grid"></div>
-  <a class="fab" href="#/new" aria-label="New move" title="New move">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-  </a>
+  <nav class="tabbar" id="tabbar" aria-label="Move actions">
+    <button type="button" class="tab" data-view="fav" aria-label="Show favourite moves" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </button>
+    <button type="button" class="tab" id="tabRandom" aria-label="Go to a random unpractised move">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+    </button>
+    <a class="tab tab-add" href="#/new" aria-label="New move" title="New move">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </a>
+    <button type="button" class="tab" data-view="practiced" aria-label="Show practised moves" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+    </button>
+    <button type="button" class="tab" data-view="unpracticed" aria-label="Show unpractised moves" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.2 3.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>
+    </button>
+  </nav>
 </main>
 
 <!-- ============ NEW MOVE ============ -->
@@ -266,6 +280,6 @@
 
 <div class="toast" id="toast" role="status"></div>
 
-<script src="app.js?v=14"></script>
+<script src="app.js?v=15"></script>
 </body>
 </html>

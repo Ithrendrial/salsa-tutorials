@@ -363,16 +363,34 @@ dialog .form-actions { margin-top: 18px; }
 .stars-sm .rest { color: var(--line); }
 .session-none { color: var(--muted); font-size: 13.5px; }
 
-/* ---------- Floating new-move button (library only) ---------- */
-.fab {
-  position: fixed; right: 28px; bottom: calc(34px + env(safe-area-inset-bottom));
-  width: 58px; height: 58px; border-radius: 50%;
-  background: var(--accent); color: var(--accent-ink);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--shadow-lift); z-index: 20;
-  transition: filter .15s, transform .15s;
+/* ---------- Floating action bar (library only) ---------- */
+.tabbar {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 20;
+  display: flex; align-items: center; gap: 4px;
+  padding: 8px 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid var(--line); box-shadow: var(--shadow-lift);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 }
-.fab:hover { filter: brightness(1.08); transform: translateY(-2px); }
+.tab {
+  width: 46px; height: 46px; border-radius: 50%; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  text-decoration: none; transition: color .12s, transform .12s;
+}
+.tab svg { width: 23px; height: 23px; }
+.tab:hover { color: var(--ink); }
+.tab:active { transform: scale(.9); }
+.tab.on { color: var(--accent); }
+.tab-add {
+  width: 54px; height: 54px; margin: 0 4px;
+  background: var(--accent); color: var(--accent-ink);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.tab-add:hover { color: var(--accent-ink); filter: brightness(1.08); }
+.tab-add svg { width: 26px; height: 26px; }
+#view-library { padding-bottom: calc(104px + env(safe-area-inset-bottom)); } /* clear the floating bar */
 
 /* ---------- Session view + meatball menu ---------- */
 .log-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -450,7 +468,7 @@ dialog .form-actions { margin-top: 18px; }
 /* ---------- Mobile ---------- */
 /* Desktop: "+ New move" lives in the header, no floating button */
 @media (min-width: 641px) {
-  .fab { display: none; }
+  .tab-add { display: none; } /* desktop keeps the header "+ New move" */
 }
 
 @media (max-width: 640px) {

@@ -4,6 +4,8 @@
 
 let moves = [];
 let activeTags = new Set(), query = "", sortNew = true, current = null, tagsExpanded = false, sessionsExpanded = false;
+let viewFilter = null; // null | "fav" | "practiced" | "unpracticed"
+const isPracticed = (m) => !!(m.sessions && m.sessions.length);
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; };
@@ -210,6 +212,9 @@ function visibleMoves() {
   const q = query.toLowerCase();
   return moves
     .filter((m) =>
+      (viewFilter !== "fav" || m.fav) &&
+      (viewFilter !== "practiced" || isPracticed(m)) &&
+      (viewFilter !== "unpracticed" || !isPracticed(m)) &&
       (activeTags.size === 0 || [...activeTags].every((t) => m.tags.includes(t))) && // move must have ALL selected tags
       (!q || m.name.toLowerCase().includes(q) ||
         m.tags.join(" ").toLowerCase().includes(q) ||
@@ -222,9 +227,13 @@ function renderGrid() {
   const list = visibleMoves();
   g.innerHTML = "";
   if (!list.length) {
-    g.innerHTML = moves.length
-      ? '<div class="empty">No results.</div>'
-      : '<div class="empty">No moves.<br><a class="btn-primary" href="#/new">Add your first move</a></div>';
+    const msg = !moves.length
+      ? 'No moves.<br><a class="btn-primary" href="#/new">Add your first move</a>'
+      : viewFilter === "fav" ? "No favourite moves yet — tap a heart to add one."
+      : viewFilter === "practiced" ? "No practised moves yet."
+      : viewFilter === "unpracticed" ? "Every move has been practised! 🎉"
+      : "No results.";
+    g.innerHTML = `<div class="empty">${msg}</div>`;
     return;
   }
   for (const m of list) {
@@ -715,6 +724,25 @@ $("sortBtn").addEventListener("click", (e) => {
 
 $("chipMore").addEventListener("click", () => { tagsExpanded = !tagsExpanded; updateChipMore(); });
 window.addEventListener("resize", updateChipMore);
+
+/* ---------- Floating action bar ---------- */
+function setViewFilter(v) {
+  viewFilter = viewFilter === v ? null : v; // tapping the active one clears it
+  document.querySelectorAll("#tabbar .tab[data-view]").forEach((b) =>
+    b.setAttribute("aria-pressed", String(b.dataset.view === viewFilter)));
+  document.querySelectorAll("#tabbar .tab[data-view]").forEach((b) =>
+    b.classList.toggle("on", b.dataset.view === viewFilter));
+  renderGrid();
+}
+document.querySelectorAll("#tabbar .tab[data-view]").forEach((b) =>
+  b.addEventListener("click", () => setViewFilter(b.dataset.view)));
+
+$("tabRandom").addEventListener("click", () => {
+  const pool = moves.filter((m) => !isPracticed(m));
+  if (!pool.length) { toast("Every move has been practised! 🎉"); return; }
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  location.hash = "#/move/" + encodeURIComponent(pick.id);
+});
 
 window.addEventListener("hashchange", route);
 loadMoves().then(route);
