@@ -237,6 +237,10 @@ function renderGrid() {
       <div class="thumb">
         <img src="https://i.ytimg.com/vi/${encodeURIComponent(m.id)}/mqdefault.jpg" alt="" loading="lazy"
              onerror="this.remove()">
+        <button type="button" class="fav-btn${m.fav ? " on" : ""}" aria-pressed="${!!m.fav}"
+                aria-label="${m.fav ? "Remove from favourites" : "Add to favourites"}">
+          <svg viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </button>
         <div class="play"><svg width="16" height="16" viewBox="0 0 22 22" fill="white"><path d="M4 2l16 9-16 9z"/></svg></div>
       </div>
       <div class="card-body">
@@ -244,7 +248,26 @@ function renderGrid() {
         <div class="card-tags">${m.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
         <div class="card-date">Added ${m.created ? fmtDate(m.created) : "—"}</div>
       </div>`;
+    const fav = card.querySelector(".fav-btn");
+    fav.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); toggleFav(m, fav); });
     g.appendChild(card);
+  }
+}
+
+async function toggleFav(m, btn) {
+  const was = !!m.fav;
+  if (was) delete m.fav; else m.fav = true; // keep moves.json tidy: no fav:false entries
+  const now = !!m.fav;
+  btn.classList.toggle("on", now);
+  btn.setAttribute("aria-pressed", String(now));
+  btn.setAttribute("aria-label", now ? "Remove from favourites" : "Add to favourites");
+  try {
+    await commitMoves((now ? "Favourite" : "Unfavourite") + ": " + m.name);
+  } catch (err) {
+    if (was) m.fav = true; else delete m.fav; // roll back to match what's stored
+    btn.classList.toggle("on", was);
+    btn.setAttribute("aria-pressed", String(was));
+    toast(err.message);
   }
 }
 
