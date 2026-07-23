@@ -34,7 +34,7 @@ body {
 }
 .wordmark, .screen-title { text-transform: uppercase; letter-spacing: -0.02em; }
 .screen-title { color: var(--accent); }
-button { font: inherit; color: inherit; cursor: pointer; }
+button { font: inherit; color: inherit; cursor: pointer;}
 input, textarea { font: inherit; color: inherit; }
 input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -42,6 +42,9 @@ input, textarea, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
   * { transition: none !important; animation: none !important; }
 }
 
+input, textarea, button, select, a {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
 /* ---------- App bar ---------- */
 .bar {
   position: sticky; top: 0; z-index: 10;
