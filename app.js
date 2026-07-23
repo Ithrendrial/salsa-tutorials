@@ -270,6 +270,7 @@ async function toggleFav(m, btn) {
   btn.classList.toggle("on", now);
   btn.setAttribute("aria-pressed", String(now));
   btn.setAttribute("aria-label", now ? "Remove from favourites" : "Add to favourites");
+  if (now) flash(btn, "burst", 460);
   try {
     await commitMoves((now ? "Favourite" : "Unfavourite") + ": " + m.name);
   } catch (err) {
@@ -701,6 +702,8 @@ function resetNewForm() {
 }
 
 /* ---------- Shared ---------- */
+const flash = (el, cls, ms = 500) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
+
 let toastTimer;
 function toast(msg) {
   const t = $("toast");
@@ -726,22 +729,25 @@ $("chipMore").addEventListener("click", () => { tagsExpanded = !tagsExpanded; up
 window.addEventListener("resize", updateChipMore);
 
 /* ---------- Floating action bar ---------- */
-function setViewFilter(v) {
+function setViewFilter(v, btn) {
   viewFilter = viewFilter === v ? null : v; // tapping the active one clears it
-  document.querySelectorAll("#tabbar .tab[data-view]").forEach((b) =>
-    b.setAttribute("aria-pressed", String(b.dataset.view === viewFilter)));
-  document.querySelectorAll("#tabbar .tab[data-view]").forEach((b) =>
-    b.classList.toggle("on", b.dataset.view === viewFilter));
+  document.querySelectorAll("#tabbar .tab[data-view]").forEach((b) => {
+    const on = b.dataset.view === viewFilter;
+    b.setAttribute("aria-pressed", String(on));
+    b.classList.toggle("on", on);
+  });
+  if (btn && viewFilter === v) flash(btn, "bounce", 420); // bounce only when switching on
   renderGrid();
 }
 document.querySelectorAll("#tabbar .tab[data-view]").forEach((b) =>
-  b.addEventListener("click", () => setViewFilter(b.dataset.view)));
+  b.addEventListener("click", () => setViewFilter(b.dataset.view, b)));
 
-$("tabRandom").addEventListener("click", () => {
+$("tabRandom").addEventListener("click", (e) => {
   const pool = moves.filter((m) => !isPracticed(m));
   if (!pool.length) { toast("Every move has been practised! 🎉"); return; }
   const pick = pool[Math.floor(Math.random() * pool.length)];
-  location.hash = "#/move/" + encodeURIComponent(pick.id);
+  flash(e.currentTarget, "spin", 550); // let the shuffle spin play before jumping
+  setTimeout(() => { location.hash = "#/move/" + encodeURIComponent(pick.id); }, 360);
 });
 
 window.addEventListener("hashchange", route);
